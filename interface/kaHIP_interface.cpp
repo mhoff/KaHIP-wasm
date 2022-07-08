@@ -31,6 +31,7 @@
 #include "../lib/data_structure/matrix/online_distance_matrix.h"
 #include "../lib/mapping/mapping_algorithms.h"
 
+#include "emscripten.h"
 
 using namespace std;
 
@@ -100,6 +101,7 @@ void internal_kaffpa_call(PartitionConfig & partition_config,
         //cout.rdbuf(backup);
 }
 
+EMSCRIPTEN_KEEPALIVE
 void kaffpa(int* n, 
                    int* vwgt, 
                    int* xadj, 

@@ -62,32 +62,32 @@ endif()
 
 
 # check dependencies
-find_package(MPI REQUIRED)
-find_package(OpenMP)
-if(OpenMP_CXX_FOUND)
-  message(STATUS "OpenMP support detected")
-  add_definitions(${OpenMP_CXX_FLAGS})
-else()
-  message(WARNING "OpenMP not available, activating workaround")
-  add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-  set_property(TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_COMPILE_OPTIONS "")
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/misc)
-endif()
-find_library(LIB_METIS metis)
-if(LIB_METIS)
-  message(STATUS "Metis support detected")
-  add_definitions("-DUSEMETIS")
-  if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    include_directories(/usr/local/include)
-  endif()
-endif()
+# find_package(MPI REQUIRED)
+# find_package(OpenMP)
+# if(OpenMP_CXX_FOUND)
+#   message(STATUS "OpenMP support detected")
+#   add_definitions(${OpenMP_CXX_FLAGS})
+# else()
+#   message(WARNING "OpenMP not available, activating workaround")
+#   add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+#   set_property(TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_COMPILE_OPTIONS "")
+#   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/misc)
+# endif()
+# find_library(LIB_METIS metis)
+# if(LIB_METIS)
+#   message(STATUS "Metis support detected")
+#   add_definitions("-DUSEMETIS")
+#   if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#     include_directories(/usr/local/include)
+#   endif()
+# endif()
 
 # 64 Bit option
-option(64BITMODE "64 bit mode" OFF)
-if(64BITMODE)
-  add_definitions("-DMODE64BITEDGES")
-  add_definitions("-DPOINTER64=1")
-endif()
+# option(64BITMODE "64 bit mode" OFF)
+# if(64BITMODE)
+#   add_definitions("-DMODE64BITEDGES")
+#   add_definitions("-DPOINTER64=1")
+# endif()
 
 # optimized output
 option(OPTIMIZED_OUTPUT "optimized output" OFF)
@@ -96,7 +96,7 @@ if(OPTIMIZED_OUTPUT)
 endif()
 
 # ParHIP
-option(PARHIP "build ParHIP" ON)
+option(PARHIP "build ParHIP" OFF)
 
 option(DETERMINISTIC_PARHIP "enforce deterministic computations in ParHIP" OFF)
 
@@ -183,182 +183,190 @@ set(LIBKAFFPA_SOURCE_FILES
   extern/argtable3-3.0.3/argtable3.c)
 add_library(libkaffpa OBJECT ${LIBKAFFPA_SOURCE_FILES})
 
-set(LIBKAFFPA_PARALLEL_SOURCE_FILES
-  lib/parallel_mh/parallel_mh_async.cpp
-  lib/parallel_mh/population.cpp
-  lib/parallel_mh/galinier_combine/gal_combine.cpp
-  lib/parallel_mh/galinier_combine/construct_partition.cpp
-  lib/parallel_mh/exchange/exchanger.cpp
-  lib/tools/graph_communication.cpp
-  lib/tools/mpi_tools.cpp)
-add_library(libkaffpa_parallel OBJECT ${LIBKAFFPA_PARALLEL_SOURCE_FILES})
-target_include_directories(libkaffpa_parallel PUBLIC ${MPI_CXX_INCLUDE_PATH})
+# set(LIBKAFFPA_PARALLEL_SOURCE_FILES
+#   lib/parallel_mh/parallel_mh_async.cpp
+#   lib/parallel_mh/population.cpp
+#   lib/parallel_mh/galinier_combine/gal_combine.cpp
+#   lib/parallel_mh/galinier_combine/construct_partition.cpp
+#   lib/parallel_mh/exchange/exchanger.cpp
+#   lib/tools/graph_communication.cpp
+#   lib/tools/mpi_tools.cpp)
+# add_library(libkaffpa_parallel OBJECT ${LIBKAFFPA_PARALLEL_SOURCE_FILES})
+# target_include_directories(libkaffpa_parallel PUBLIC ${MPI_CXX_INCLUDE_PATH})
 
-set(LIBMAPPING_SOURCE_FILES
-  lib/mapping/local_search_mapping.cpp
-  lib/mapping/full_search_space.cpp
-  lib/mapping/full_search_space_pruned.cpp
-  lib/mapping/communication_graph_search_space.cpp
-  lib/mapping/fast_construct_mapping.cpp
-  lib/mapping/construct_distance_matrix.cpp
-  lib/mapping/mapping_algorithms.cpp
-  lib/mapping/construct_mapping.cpp)
-add_library(libmapping OBJECT ${LIBMAPPING_SOURCE_FILES})
+# set(LIBMAPPING_SOURCE_FILES
+#   lib/mapping/local_search_mapping.cpp
+#   lib/mapping/full_search_space.cpp
+#   lib/mapping/full_search_space_pruned.cpp
+#   lib/mapping/communication_graph_search_space.cpp
+#   lib/mapping/fast_construct_mapping.cpp
+#   lib/mapping/construct_distance_matrix.cpp
+#   lib/mapping/mapping_algorithms.cpp
+#   lib/mapping/construct_mapping.cpp)
+# add_library(libmapping OBJECT ${LIBMAPPING_SOURCE_FILES})
 
-set(LIBSPAC_SOURCE_FILES lib/spac/spac.cpp)
-add_library(libspac OBJECT ${LIBSPAC_SOURCE_FILES})
+# set(LIBSPAC_SOURCE_FILES lib/spac/spac.cpp)
+# add_library(libspac OBJECT ${LIBSPAC_SOURCE_FILES})
 
-set(NODE_ORDERING_SOURCE_FILES
-  lib/node_ordering/min_degree_ordering.cpp
-  lib/node_ordering/nested_dissection.cpp
-  lib/node_ordering/ordering_tools.cpp
-  lib/node_ordering/reductions.cpp)
-add_library(libnodeordering OBJECT ${NODE_ORDERING_SOURCE_FILES})
+# set(NODE_ORDERING_SOURCE_FILES
+#   lib/node_ordering/min_degree_ordering.cpp
+#   lib/node_ordering/nested_dissection.cpp
+#   lib/node_ordering/ordering_tools.cpp
+#   lib/node_ordering/reductions.cpp)
+# add_library(libnodeordering OBJECT ${NODE_ORDERING_SOURCE_FILES})
 
 # generate targets for each binary
-add_executable(kaffpa app/kaffpa.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# add_executable(kaffpa app/kaffpa.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(kaffpa PRIVATE "-DMODE_KAFFPA")
+# # target_link_libraries(kaffpa ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS kaffpa DESTINATION bin)
+# if (USE_TCMALLOC)
+#   find_library(TCMALLOC_LIB tcmalloc)
+#   if (TCMALLOC_LIB)
+#     target_link_libraries(kaffpa ${TCMALLOC_LIB})
+#     message(STATUS "Using tcmalloc: ${TCMALLOC_LIB}")
+#   else ()
+#     message(STATUS "tcmalloc enabled but unavailable on this system")
+#   endif ()
+# endif ()
+
+add_executable(kaffpa interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa>)
 target_compile_definitions(kaffpa PRIVATE "-DMODE_KAFFPA")
-target_link_libraries(kaffpa ${OpenMP_CXX_LIBRARIES})
+target_link_libraries(kaffpa "-s MODULARIZE=1")
+target_link_libraries(kaffpa "-s EXPORT_ES6=1")
+target_link_libraries(kaffpa "-s USE_ES6_IMPORT_META=0")
 install(TARGETS kaffpa DESTINATION bin)
-if (USE_TCMALLOC)
-  find_library(TCMALLOC_LIB tcmalloc)
-  if (TCMALLOC_LIB)
-    target_link_libraries(kaffpa ${TCMALLOC_LIB})
-    message(STATUS "Using tcmalloc: ${TCMALLOC_LIB}")
-  else ()
-    message(STATUS "tcmalloc enabled but unavailable on this system")
-  endif ()
-endif ()
 
-add_executable(global_multisection app/global_multisection.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(global_multisection PRIVATE "-DMODE_KAFFPA -DMODE_GLOBALMS")
-target_link_libraries(global_multisection ${OpenMP_CXX_LIBRARIES})
-install(TARGETS global_multisection DESTINATION bin)
-if (USE_TCMALLOC)
-  find_library(TCMALLOC_LIB tcmalloc)
-  if (TCMALLOC_LIB)
-    target_link_libraries(global_multisection ${TCMALLOC_LIB})
-    message(STATUS "Using tcmalloc: ${TCMALLOC_LIB}")
-  else ()
-    message(STATUS "tcmalloc enabled but unavailable on this system")
-  endif ()
-endif ()
+# add_executable(global_multisection app/global_multisection.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(global_multisection PRIVATE "-DMODE_KAFFPA -DMODE_GLOBALMS")
+# target_link_libraries(global_multisection ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS global_multisection DESTINATION bin)
+# if (USE_TCMALLOC)
+#   find_library(TCMALLOC_LIB tcmalloc)
+#   if (TCMALLOC_LIB)
+#     target_link_libraries(global_multisection ${TCMALLOC_LIB})
+#     message(STATUS "Using tcmalloc: ${TCMALLOC_LIB}")
+#   else ()
+#     message(STATUS "tcmalloc enabled but unavailable on this system")
+#   endif ()
+# endif ()
 
-add_executable(evaluator app/evaluator.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(evaluator PRIVATE "-DMODE_EVALUATOR")
-target_link_libraries(evaluator ${OpenMP_CXX_LIBRARIES})
-install(TARGETS evaluator DESTINATION bin)
+# add_executable(evaluator app/evaluator.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(evaluator PRIVATE "-DMODE_EVALUATOR")
+# target_link_libraries(evaluator ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS evaluator DESTINATION bin)
 
-add_executable(node_separator app/node_separator_ml.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(node_separator PRIVATE "-DMODE_NODESEP")
-target_link_libraries(node_separator ${OpenMP_CXX_LIBRARIES})
-install(TARGETS node_separator DESTINATION bin)
+# add_executable(node_separator app/node_separator_ml.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(node_separator PRIVATE "-DMODE_NODESEP")
+# target_link_libraries(node_separator ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS node_separator DESTINATION bin)
 
-add_executable(label_propagation app/label_propagation.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(label_propagation PRIVATE "-DMODE_LABELPROPAGATION")
-target_link_libraries(label_propagation ${OpenMP_CXX_LIBRARIES})
-install(TARGETS label_propagation DESTINATION bin)
+# add_executable(label_propagation app/label_propagation.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(label_propagation PRIVATE "-DMODE_LABELPROPAGATION")
+# target_link_libraries(label_propagation ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS label_propagation DESTINATION bin)
 
-add_executable(partition_to_vertex_separator app/partition_to_vertex_separator.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(partition_to_vertex_separator PRIVATE "-DMODE_PARTITIONTOVERTEXSEPARATOR")
-target_link_libraries(partition_to_vertex_separator ${OpenMP_CXX_LIBRARIES})
-install(TARGETS partition_to_vertex_separator DESTINATION bin)
+# add_executable(partition_to_vertex_separator app/partition_to_vertex_separator.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(partition_to_vertex_separator PRIVATE "-DMODE_PARTITIONTOVERTEXSEPARATOR")
+# target_link_libraries(partition_to_vertex_separator ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS partition_to_vertex_separator DESTINATION bin)
 
-add_executable(interface_test misc/example_library_call/interface_test.cpp interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libnodeordering>)
-target_include_directories(interface_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/interface)
-target_compile_definitions(interface_test PRIVATE "-DMODE_KAFFPA")
-target_link_libraries(interface_test ${OpenMP_CXX_LIBRARIES})
-if(LIB_METIS)
-        target_link_libraries(interface_test ${LIB_METIS})
-endif()
-install(TARGETS interface_test DESTINATION bin)
+# add_executable(interface_test misc/example_library_call/interface_test.cpp interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libnodeordering>)
+# target_include_directories(interface_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/interface)
+# target_compile_definitions(interface_test PRIVATE "-DMODE_KAFFPA")
+# target_link_libraries(interface_test ${OpenMP_CXX_LIBRARIES})
+# if(LIB_METIS)
+#         target_link_libraries(interface_test ${LIB_METIS})
+# endif()
+# install(TARGETS interface_test DESTINATION bin)
 
-add_executable(kaffpaE app/kaffpaE.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libkaffpa_parallel>)
-target_compile_definitions(kaffpaE PRIVATE "-DMODE_KAFFPAE")
-target_include_directories(kaffpaE PUBLIC ${MPI_CXX_INCLUDE_PATH})
-target_link_libraries(kaffpaE ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES} OpenMP::OpenMP_CXX )
-install(TARGETS kaffpaE DESTINATION bin)
+# add_executable(kaffpaE app/kaffpaE.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libkaffpa_parallel>)
+# target_compile_definitions(kaffpaE PRIVATE "-DMODE_KAFFPAE")
+# target_include_directories(kaffpaE PUBLIC ${MPI_CXX_INCLUDE_PATH})
+# target_link_libraries(kaffpaE ${MPI_CXX_LIBRARIES} ${OpenMP_CXX_LIBRARIES} OpenMP::OpenMP_CXX )
+# install(TARGETS kaffpaE DESTINATION bin)
 
-add_executable(graphchecker app/graphchecker.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-target_compile_definitions(graphchecker PRIVATE "-DMODE_GRAPHCHECKER")
-target_link_libraries(graphchecker ${OpenMP_CXX_LIBRARIES})
-install(TARGETS graphchecker DESTINATION bin)
+# add_executable(graphchecker app/graphchecker.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+# target_compile_definitions(graphchecker PRIVATE "-DMODE_GRAPHCHECKER")
+# target_link_libraries(graphchecker ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS graphchecker DESTINATION bin)
 
-add_executable(edge_partitioning app/spac.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libspac>)
-target_compile_definitions(edge_partitioning PRIVATE "-DMODE_KAFFPA")
-target_link_libraries(edge_partitioning ${OpenMP_CXX_LIBRARIES})
-install(TARGETS edge_partitioning DESTINATION bin)
+# add_executable(edge_partitioning app/spac.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping> $<TARGET_OBJECTS:libspac>)
+# target_compile_definitions(edge_partitioning PRIVATE "-DMODE_KAFFPA")
+# target_link_libraries(edge_partitioning ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS edge_partitioning DESTINATION bin)
 
-add_executable(node_ordering app/node_ordering.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libnodeordering>)
-target_compile_definitions(node_ordering PRIVATE "-DMODE_NODESEP -DMODE_NODEORDERING")
-target_link_libraries(node_ordering ${OpenMP_CXX_LIBRARIES})
-install(TARGETS node_ordering DESTINATION bin)
+# add_executable(node_ordering app/node_ordering.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libnodeordering>)
+# target_compile_definitions(node_ordering PRIVATE "-DMODE_NODESEP -DMODE_NODEORDERING")
+# target_link_libraries(node_ordering ${OpenMP_CXX_LIBRARIES})
+# install(TARGETS node_ordering DESTINATION bin)
 
-if(LIB_METIS)
-  add_executable(fast_node_ordering app/fast_node_ordering.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libnodeordering>)
-  target_compile_definitions(fast_node_ordering PRIVATE "-DMODE_NODESEP -DMODE_NODEORDERING -DFASTORDERING")
-  target_link_libraries(fast_node_ordering ${OpenMP_CXX_LIBRARIES} ${LIB_METIS})
-  install(TARGETS fast_node_ordering DESTINATION bin)
-endif()
+# if(LIB_METIS)
+#   add_executable(fast_node_ordering app/fast_node_ordering.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libnodeordering>)
+#   target_compile_definitions(fast_node_ordering PRIVATE "-DMODE_NODESEP -DMODE_NODEORDERING -DFASTORDERING")
+#   target_link_libraries(fast_node_ordering ${OpenMP_CXX_LIBRARIES} ${LIB_METIS})
+#   install(TARGETS fast_node_ordering DESTINATION bin)
+# endif()
 
 
 # Shared interface library
-add_library(kahip SHARED interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa>
-                                                           $<TARGET_OBJECTS:libmapping>
-                                                           $<TARGET_OBJECTS:libnodeordering>)
-target_include_directories(kahip PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface)
-target_compile_definitions(kahip PRIVATE "-DMODE_KAFFPA")
-target_link_libraries(kahip PUBLIC ${OpenMP_CXX_LIBRARIES})
-if(LIB_METIS)
-        target_link_libraries(kahip PUBLIC ${LIB_METIS})
-endif()
-install(TARGETS kahip DESTINATION lib)
+# add_library(kahip SHARED interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa>
+#                                                            $<TARGET_OBJECTS:libmapping>
+#                                                            $<TARGET_OBJECTS:libnodeordering>)
+# target_include_directories(kahip PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface)
+# target_compile_definitions(kahip PRIVATE "-DMODE_KAFFPA")
+# target_link_libraries(kahip PUBLIC ${OpenMP_CXX_LIBRARIES})
+# if(LIB_METIS)
+#         target_link_libraries(kahip PUBLIC ${LIB_METIS})
+# endif()
+# install(TARGETS kahip DESTINATION lib)
 
 # Static interface library
-add_library(kahip_static interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa>
-                                                           $<TARGET_OBJECTS:libmapping>
-                                                           $<TARGET_OBJECTS:libnodeordering>)
-target_include_directories(kahip_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface)
-target_compile_definitions(kahip_static PRIVATE "-DMODE_KAFFPA")
-target_link_libraries(kahip_static PUBLIC ${OpenMP_CXX_LIBRARIES})
-set_target_properties(kahip_static PROPERTIES PUBLIC_HEADER interface/kaHIP_interface.h)
+# add_library(kahip_static interface/kaHIP_interface.cpp $<TARGET_OBJECTS:libkaffpa>
+#                                                           #  $<TARGET_OBJECTS:libmapping>
+#                                                           #  $<TARGET_OBJECTS:libnodeordering>
+#                                                            )
+# target_include_directories(kahip_static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface)
+# target_compile_definitions(kahip_static PRIVATE "-DMODE_KAFFPA")
+# # target_link_libraries(kahip_static PUBLIC ${OpenMP_CXX_LIBRARIES})
+# set_target_properties(kahip_static PROPERTIES PUBLIC_HEADER interface/kaHIP_interface.h)
 
-if(LIB_METIS)
-        target_link_libraries(kahip_static PUBLIC ${LIB_METIS})
-endif()
+# if(LIB_METIS)
+#         target_link_libraries(kahip_static PUBLIC ${LIB_METIS})
+# endif()
 
-install(TARGETS kahip_static
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        PUBLIC_HEADER DESTINATION include
-        )
+# install(TARGETS kahip_static
+#         ARCHIVE DESTINATION lib
+#         LIBRARY DESTINATION lib
+#         PUBLIC_HEADER DESTINATION include
+#         )
 
 # ParHIP
-if(PARHIP)
-  add_subdirectory(parallel/modified_kahip)
-  add_subdirectory(parallel/parallel_src)
-endif()
+# if(PARHIP)
+#   add_subdirectory(parallel/modified_kahip)
+#   add_subdirectory(parallel/parallel_src)
+# endif()
 
-if(USE_ILP)
-  find_package(Gurobi REQUIRED)
-  MESSAGE("Using Gurobi for ILP solver in ilp_improve")
-  add_executable(ilp_improve app/ilp_improve.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-  target_include_directories(ilp_improve PUBLIC ${GUROBI_INCLUDE_DIR})
-  target_compile_definitions(ilp_improve PRIVATE "-DMODE_ILPIMPROVE")
-  target_link_libraries(ilp_improve ${OpenMP_CXX_LIBRARIES} ${GUROBI_LIBRARIES})
+# if(USE_ILP)
+#   find_package(Gurobi REQUIRED)
+#   MESSAGE("Using Gurobi for ILP solver in ilp_improve")
+#   add_executable(ilp_improve app/ilp_improve.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+#   target_include_directories(ilp_improve PUBLIC ${GUROBI_INCLUDE_DIR})
+#   target_compile_definitions(ilp_improve PRIVATE "-DMODE_ILPIMPROVE")
+#   target_link_libraries(ilp_improve ${OpenMP_CXX_LIBRARIES} ${GUROBI_LIBRARIES})
 
-  add_executable(ilp_exact app/ilp_exact.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
-  target_include_directories(ilp_exact PUBLIC ${GUROBI_INCLUDE_DIR})
-  target_compile_definitions(ilp_exact PRIVATE "-DMODE_ILPIMPROVE -DMODE_ILPEXACT")
-  target_link_libraries(ilp_exact ${OpenMP_CXX_LIBRARIES} ${GUROBI_LIBRARIES})
+#   add_executable(ilp_exact app/ilp_exact.cpp $<TARGET_OBJECTS:libkaffpa> $<TARGET_OBJECTS:libmapping>)
+#   target_include_directories(ilp_exact PUBLIC ${GUROBI_INCLUDE_DIR})
+#   target_compile_definitions(ilp_exact PRIVATE "-DMODE_ILPIMPROVE -DMODE_ILPEXACT")
+#   target_link_libraries(ilp_exact ${OpenMP_CXX_LIBRARIES} ${GUROBI_LIBRARIES})
 
-endif()
+# endif()
 
 # pybind11 module
-option(BUILDPYTHONMODULE "Build Python binding." OFF)
-if (BUILDPYTHONMODULE)
-  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/misc/pymodule/pybind11)
-  pybind11_add_module(kahip_python_binding ${CMAKE_CURRENT_SOURCE_DIR}/misc/pymodule/kahip.cpp)
-  target_link_libraries(kahip_python_binding PUBLIC kahip_static)
-  set_target_properties(kahip_python_binding PROPERTIES OUTPUT_NAME "kahip")
-endif ()
+# option(BUILDPYTHONMODULE "Build Python binding." OFF)
+# if (BUILDPYTHONMODULE)
+#   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/misc/pymodule/pybind11)
+#   pybind11_add_module(kahip_python_binding ${CMAKE_CURRENT_SOURCE_DIR}/misc/pymodule/kahip.cpp)
+#   target_link_libraries(kahip_python_binding PUBLIC kahip_static)
+#   set_target_properties(kahip_python_binding PROPERTIES OUTPUT_NAME "kahip")
+# endif ()
