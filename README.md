@@ -94,6 +94,15 @@ Lastly, we provide an option for determinism in ParHIP, e.g. two runs with the s
 ./compile_withcmake -DDETERMINISTIC_PARHIP=On
 ```
 
+## Compiling KaFFPa as WASM:
+
+```sh
+mkdir build
+emcmake cmake ..
+cmake --build . -j 8 # use multiple cores for compilation
+# results in kaffpa.js, kaffpa.wasm
+```
+
 Running Programs
 =====
 
